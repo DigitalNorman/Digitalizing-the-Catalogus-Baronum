@@ -219,6 +219,7 @@ function combinedRows(lords, holdings) {
             const feudiOwned = clean(lord.Feudi_Owned) || 'NA';
             const comestabuliaValue = comestabuliaOrComitatus(holding);
             const modCommuneValue = modCommuneWithFeudi(holding);
+            const contComName = clean(holding.Cont_Com_Name) || 'NA';
             const province = clean(holding.Modern_Province) || 'NA';
 
             const rowValues = [
@@ -230,6 +231,7 @@ function combinedRows(lords, holdings) {
                 firstRow ? feudiOwned : '',
                 comestabuliaValue,
                 modCommuneValue,
+                contComName,
                 province
             ];
 
@@ -242,6 +244,7 @@ function combinedRows(lords, holdings) {
                 feudiOwned,
                 comestabuliaValue,
                 modCommuneValue,
+                contComName,
                 province
             ];
 
@@ -331,10 +334,11 @@ async function loadAndBuildTables() {
     ui.status.textContent = 'Loading and combining tables...';
 
     try {
+        const cacheBuster = `?t=${Date.now()}`;
         const [lordsResponse, holdingsResponse, originalResponse] = await Promise.all([
-            fetch(encodeURI(FILES.lords)),
-            fetch(encodeURI(FILES.holdings)),
-            fetch(encodeURI(FILES.original))
+            fetch(encodeURI(FILES.lords) + cacheBuster),
+            fetch(encodeURI(FILES.holdings) + cacheBuster),
+            fetch(encodeURI(FILES.original) + cacheBuster)
         ]);
 
         if (!lordsResponse.ok || !holdingsResponse.ok || !originalResponse.ok) {
@@ -374,6 +378,7 @@ async function loadAndBuildTables() {
                 'Fiefs',
                 'Constable or Count',
                 'City and # of Knights Owed',
+                'Contemporary City name',
                 'Province'
             ],
             state.combinedRows,
