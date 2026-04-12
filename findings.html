@@ -17,69 +17,46 @@
         </ul>
     </nav>
 
+    <!-- Section Header -->
+    <h2>Searchable Findings Database</h2>
+
+    <!-- Content Section -->
     <section class="intro-section">
-        <p>This page combines a searchable database with a municipality choropleth built from the files in the <strong>databasefiles</strong> folder. Search the holdings and lord tables below to update the visible records and the shaded map at the same time.</p>
+        <p>Use the controls below to search across all columns, edit values directly in the table, and toggle the list view. The search bar is above the list and can be set to show only matching rows.</p>
     </section>
 
-    <section class="database-shell">
-        <section class="intro-section search-panel">
-            <h2>Search Database</h2>
-            <label class="search-label" for="database-search">Search by town, lord, province, constable, or note</label>
-            <input id="database-search" type="search" placeholder="Type to filter the database..." autocomplete="off">
-            <div class="database-stats" id="database-stats" aria-live="polite"></div>
-        </section>
+    <section class="findings-db">
+        <section class="intro-section db-controls-panel">
+            <label class="db-label" for="db-source">Database source</label>
+            <select id="db-source">
+                <option value="databasefiles/Final Baronum - Fief Holdings.csv">Fief Holdings</option>
+                <option value="databasefiles/Final Baronum - Lords and Soldiers.csv">Lords and Soldiers</option>
+                <option value="databasefiles/Final Baronum - Original Text.csv">Original Text</option>
+            </select>
 
-        <section class="intro-section map-panel">
-            <h2>Choropleth Map</h2>
-            <p class="map-caption">The map shades municipalities using the filtered fief holdings dataset.</p>
-            <div class="map-status" id="map-status">Loading data from databasefiles...</div>
-            <div class="map-wrap">
-                <svg id="choropleth-map" role="img" aria-label="Choropleth map of municipal holdings"></svg>
+            <label class="db-label" for="db-search">Search all parameters</label>
+            <input id="db-search" type="search" placeholder="Search any field..." autocomplete="off">
+
+            <div class="db-toggle-row">
+                <label class="db-toggle">
+                    <input id="db-only-matches" type="checkbox" checked>
+                    Show only search results
+                </label>
+                <button id="db-toggle-list" type="button">Hide List</button>
             </div>
-            <div class="map-legend" id="map-legend"></div>
+
+            <div id="db-status" class="db-status" aria-live="polite">Loading database...</div>
         </section>
 
-        <section class="database-grid">
-            <article class="intro-section database-table-card">
-                <h2>Fief Holdings Database</h2>
-                <div class="table-wrap">
-                    <table class="data-table" id="fief-table">
-                        <thead>
-                            <tr>
-                                <th>Book ID</th>
-                                <th>Modern Commune</th>
-                                <th>Old Commune</th>
-                                <th>Province</th>
-                                <th>Fiefs</th>
-                                <th>Constable / Count</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </article>
-
-            <article class="intro-section database-table-card">
-                <h2>Lords and Soldiers Database</h2>
-                <div class="table-wrap">
-                    <table class="data-table" id="lord-table">
-                        <thead>
-                            <tr>
-                                <th>Book ID</th>
-                                <th>Name</th>
-                                <th>Milites</th>
-                                <th>Servientes</th>
-                                <th>Feudi Owned</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </article>
+        <section class="intro-section db-table-panel" id="db-list-panel">
+            <div class="table-wrap">
+                <table class="data-table" id="db-table">
+                    <thead id="db-head"></thead>
+                    <tbody id="db-body"></tbody>
+                </table>
+            </div>
         </section>
     </section>
 
-    <script src="databasefiles/findings-database.js"></script>
+    <script src="databasefiles/findings-search.js"></script>
 </body>
