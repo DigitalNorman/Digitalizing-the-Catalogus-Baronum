@@ -1,0 +1,259 @@
+/* Medieval Themed Stylesheet */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Grimace', 'Garamond', serif;
+    background-color: #2a1810;
+    background-image: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(139, 69, 19, 0.1) 2px,
+            rgba(139, 69, 19, 0.1) 4px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(139, 69, 19, 0.1) 2px,
+            rgba(139, 69, 19, 0.1) 4px
+        );
+    color: #d4af37;
+    line-height: 1.8;
+    padding: 2rem;
+}
+
+/* Parchment effect container */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(210, 180, 140, 0.03);
+    pointer-events: none;
+    z-index: -2;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Crimson Text', 'Georgia', serif;
+    color: #f4d03f;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 3px solid #8b4513;
+    padding-bottom: 0.5rem;
+    letter-spacing: 0.1em;
+}
+
+h1 {
+    font-size: 3rem;
+    text-align: center;
+    text-transform: uppercase;
+    border: 3px double #d4af37;
+    padding: 1.5rem;
+    background-color: rgba(139, 69, 19, 0.2);
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+h1::before,
+h1::after {
+    content: '⚜';
+    display: inline-block;
+    margin: 0 1rem;
+    color: #d4af37;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-top: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+/* Paragraphs and text */
+p {
+    margin-bottom: 1.5rem;
+    text-align: justify;
+    color: #e6d5bf;
+}
+
+/* Links */
+a {
+    color: #f4d03f;
+    text-decoration: none;
+    border-bottom: 2px solid #8b4513;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: #fff;
+    background-color: rgba(139, 69, 19, 0.3);
+    padding-bottom: 0.25rem;
+}
+
+/* Lists */
+ul, ol {
+    margin-left: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+li {
+    margin-bottom: 0.75rem;
+    color: #e6d5bf;
+}
+
+ul > li::marker {
+    color: #d4af37;
+}
+
+/* Blockquotes */
+blockquote {
+    border-left: 5px solid #d4af37;
+    border-right: 5px solid #d4af37;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    background-color: rgba(139, 69, 19, 0.15);
+    color: #f4d03f;
+    font-style: italic;
+    font-size: 1.1rem;
+}
+
+/* Code blocks */
+code, pre {
+    background-color: #1a0f0a;
+    color: #d4af37;
+    border: 1px solid #8b4513;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+code {
+    padding: 0.2rem 0.5rem;
+}
+
+pre {
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+
+/* Buttons */
+button, .button {
+    background-color: #8b4513;
+    color: #f4d03f;
+    border: 2px solid #d4af37;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Garamond', serif;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+button:hover, .button:hover {
+    background-color: #a0522d;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(244, 208, 63, 0.5);
+}
+
+/* Horizontal rules */
+hr {
+    border: none;
+    height: 3px;
+    background: linear-gradient(to right, #8b4513, #d4af37, #8b4513);
+    margin: 2rem 0;
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+    border: 3px solid #8b4513;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    margin: 1.5rem 0;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    background-color: rgba(139, 69, 19, 0.1);
+}
+
+th, td {
+    border: 2px solid #8b4513;
+    padding: 0.75rem;
+    text-align: left;
+    color: #e6d5bf;
+}
+
+th {
+    background-color: rgba(139, 69, 19, 0.4);
+    color: #f4d03f;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Forms */
+input, textarea, select {
+    background-color: #1a0f0a;
+    color: #d4af37;
+    border: 2px solid #8b4513;
+    padding: 0.75rem;
+    font-family: 'Garamond', serif;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #2a1810;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #8b4513;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #d4af37;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+}
