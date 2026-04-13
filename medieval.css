@@ -444,7 +444,12 @@ input:focus, textarea:focus, select:focus {
     }
 
     .footer-sep {
-        display: none;
+        display: block;
+        width: 70%;
+        height: 0;
+        margin: 0.2rem auto;
+        border-left: none;
+        border-top: 2px solid #6b1a27;
     }
 
     .site-footer p {
