@@ -230,8 +230,8 @@ function combinedRows(lords, holdings) {
                 firstRow ? servientes : '',
                 firstRow ? feudiOwned : '',
                 comestabuliaValue,
-                modCommuneValue,
                 contComName,
+                modCommuneValue,
                 province
             ];
 
@@ -243,8 +243,8 @@ function combinedRows(lords, holdings) {
                 servientes,
                 feudiOwned,
                 comestabuliaValue,
-                modCommuneValue,
                 contComName,
+                modCommuneValue,
                 province
             ];
 
@@ -377,8 +377,8 @@ async function loadAndBuildTables() {
                 'Soldiers',
                 'Fiefs',
                 'Constable or Count',
-                'City and # of Knights Owed',
                 'Contemporary City name',
+                'City and # of Knights Owed',
                 'Province'
             ],
             state.combinedRows,
