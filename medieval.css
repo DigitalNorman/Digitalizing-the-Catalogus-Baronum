@@ -400,6 +400,24 @@ input:focus, textarea:focus, select:focus {
     display: none;
 }
 
+/* Site footer */
+.site-footer {
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid #d4a574;
+    text-align: center;
+}
+
+.site-footer p {
+    margin: 0;
+    text-align: center;
+}
+
+.footer-sep {
+    margin: 0 0.5rem;
+    color: #8b7355;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     body {
@@ -412,5 +430,15 @@ input:focus, textarea:focus, select:focus {
     
     h2 {
         font-size: 1.5rem;
+    }
+
+    .footer-sep {
+        display: none;
+    }
+
+    .site-footer p {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
     }
 }
