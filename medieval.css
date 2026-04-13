@@ -444,17 +444,20 @@ input:focus, textarea:focus, select:focus {
     }
 
     .footer-sep {
-        display: block;
-        width: 70%;
-        height: 0;
-        margin: 0.2rem auto;
-        border-left: none;
-        border-top: 2px solid #6b1a27;
+        display: inline-block;
+        width: 0;
+        height: 1.1rem;
+        margin: 0 0.35rem;
+        border-left: 2px solid #6b1a27;
+        border-top: none;
     }
 
     .site-footer p {
         display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 0.2rem;
     }
 }
