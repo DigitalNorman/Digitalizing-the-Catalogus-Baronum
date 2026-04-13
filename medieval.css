@@ -403,14 +403,19 @@ input:focus, textarea:focus, select:focus {
 /* Site footer */
 .site-footer {
     margin-top: 2.5rem;
-    padding-top: 1rem;
+    padding-top: 1.25rem;
+    padding-bottom: 0.5rem;
     border-top: 2px solid #d4a574;
     text-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 .site-footer p {
     margin: 0;
     text-align: center;
+    font-size: 1.15rem;
+    line-height: 1.9;
 }
 
 .footer-sep {
