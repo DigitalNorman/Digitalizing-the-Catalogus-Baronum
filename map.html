@@ -61,11 +61,54 @@
 			zoomControl: true
 		}).setView([41.9, 12.5], 6);
 
-		L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-			maxZoom: 18,
-			subdomains: 'abcd',
-			attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
-		}).addTo(map);
+		function getFirstCoordinate(geojson) {
+			if (!geojson || !Array.isArray(geojson.features)) {
+				return null;
+			}
+
+			for (const feature of geojson.features) {
+				if (!feature || !feature.geometry || !feature.geometry.coordinates) {
+					continue;
+				}
+
+				let cursor = feature.geometry.coordinates;
+				while (Array.isArray(cursor)) {
+					if (typeof cursor[0] === 'number' && typeof cursor[1] === 'number') {
+						return [cursor[0], cursor[1]];
+					}
+					cursor = cursor[0];
+				}
+			}
+
+			return null;
+		}
+
+		function looksLikeLatLngOrder(coord) {
+			const x = coord[0];
+			const y = coord[1];
+
+			// Italy should be around lon 6..19 and lat 35..48. If flipped, x is in lat range.
+			const xLooksLikeLat = x >= 35 && x <= 48;
+			const yLooksLikeLon = y >= 6 && y <= 19;
+			return xLooksLikeLat && yLooksLikeLon;
+		}
+
+		function swapCoordinateOrder(coords) {
+			if (!Array.isArray(coords)) {
+				return;
+			}
+
+			if (typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+				const x = coords[0];
+				coords[0] = coords[1];
+				coords[1] = x;
+				return;
+			}
+
+			for (const child of coords) {
+				swapCoordinateOrder(child);
+			}
+		}
 
 		const layerStyle = {
 			color: '#6b1a27',
@@ -87,6 +130,18 @@
 				return response.json();
 			})
 			.then((data) => {
+				const crsName = data && data.crs && data.crs.properties ? data.crs.properties.name : 'unspecified CRS';
+				const firstCoord = getFirstCoordinate(data);
+				const needsSwap = firstCoord ? looksLikeLatLngOrder(firstCoord) : false;
+
+				if (needsSwap && Array.isArray(data.features)) {
+					for (const feature of data.features) {
+						if (feature && feature.geometry && feature.geometry.coordinates) {
+							swapCoordinateOrder(feature.geometry.coordinates);
+						}
+					}
+				}
+
 				const boundaries = L.geoJSON(data, {
 					style: layerStyle,
 					onEachFeature: (feature, layer) => {
@@ -129,7 +184,7 @@
 				window.addEventListener('resize', () => {
 					map.invalidateSize();
 				});
-				statusEl.textContent = 'Loaded municipal boundaries successfully.';
+				statusEl.textContent = 'Loaded municipal boundaries successfully. CRS: ' + crsName + (needsSwap ? ' (lat/lon swapped to lon/lat for Leaflet).' : ' (lon/lat order confirmed).');
 			})
 			.catch((error) => {
 				statusEl.textContent = error.message + ' Open the site through a local server if needed.';

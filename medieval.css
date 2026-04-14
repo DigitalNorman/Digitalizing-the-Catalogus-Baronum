@@ -423,6 +423,14 @@ input:focus, textarea:focus, select:focus {
     background: #efe2c5;
 }
 
+#italy-map.leaflet-container {
+    background: #efe2c5;
+}
+
+#italy-map .leaflet-tile {
+    outline: 1px solid transparent;
+}
+
 #italy-map path {
     stroke-width: 0.7;
 }
