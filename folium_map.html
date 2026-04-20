@@ -77,13 +77,12 @@
 
         .lord-panel-controls {
             display: flex;
-            flex-wrap: wrap;
             gap: 0.45rem;
             margin-top: 0.55rem;
         }
 
         .lord-panel-controls button {
-            flex: 1 1 30%;
+            flex: 1;
             padding: 0.45rem 0.35rem;
             font-size: 0.72rem;
             letter-spacing: 0.06em;
@@ -282,7 +281,6 @@
                 <div class="lord-panel-controls">
                     <button id="lords-select-visible" type="button">Select Visible</button>
                     <button id="lords-clear-selection" type="button">Clear Selection</button>
-                    <button id="lords-toggle-relevance" type="button">Hide Non-highlighted Outlines: ON</button>
                 </div>
                 <button id="lord-panel-toggle" class="lord-panel-toggle" type="button" aria-expanded="true" aria-label="Minimize table" title="Minimize table">X</button>
                 <div id="lord-panel-status" class="lord-panel-status" aria-live="polite">Loading lord data...</div>
@@ -326,7 +324,6 @@
             status: document.getElementById('lord-panel-status'),
             selectVisible: document.getElementById('lords-select-visible'),
             clearSelection: document.getElementById('lords-clear-selection'),
-            toggleRelevance: document.getElementById('lords-toggle-relevance'),
             panelToggle: document.getElementById('lord-panel-toggle'),
             panelRestore: document.getElementById('lord-panel-restore'),
             iframe: document.getElementById('folium-iframe')
@@ -339,15 +336,8 @@
             query: '',
             mapApi: null,
             totalFiefsOwed: 0,
-            isPanelCollapsed: false,
-            hideIrrelevantMunicipalities: true
+            isPanelCollapsed: false
         };
-
-        function setRelevanceToggleLabel() {
-            ui.toggleRelevance.textContent = state.hideIrrelevantMunicipalities
-                ? 'Hide Non-highlighted Outlines: ON'
-                : 'Hide Non-highlighted Outlines: OFF';
-        }
 
         function setPanelCollapsed(collapsed) {
             state.isPanelCollapsed = Boolean(collapsed);
@@ -732,31 +722,6 @@
                 fillOpacity: 0
             };
         }
-        
-        function hiddenPolygonStyle() {
-            return {
-                color: '#000000',
-                weight: 0,
-                opacity: 0,
-                fillColor: '#efe2c5',
-                fillOpacity: 0
-            };
-        }
-        
-        function relevantCommuneKeys(mapApi) {
-            const keys = new Set();
-            
-            state.lords.forEach((lord) => {
-                lord.holdings.forEach((holding) => {
-                    const communeKey = resolveHoldingCommuneKey(mapApi, holding);
-                    if (communeKey) {
-                        keys.add(communeKey);
-                    }
-                });
-            });
-            
-            return keys;
-        }
 
         function applyMapSelection() {
             const mapApi = getMapApi();
@@ -778,11 +743,6 @@
                     }
                     if (layer.unbindTooltip) {
                         layer.unbindTooltip();
-                    }
-
-                    if (state.hideIrrelevantMunicipalities) {
-                        layer.setStyle(hiddenPolygonStyle());
-                        return;
                     }
 
                     layer.setStyle(defaultPolygonStyle());
@@ -910,10 +870,6 @@
                         selectionBounds.extend(layer.getBounds());
                     }
                 } else {
-                    if (state.hideIrrelevantMunicipalities) {
-                        layer.setStyle(hiddenPolygonStyle());
-                        return;
-                    }
                     layer.setStyle(defaultPolygonStyle());
                 }
             });
@@ -954,12 +910,6 @@
             ui.clearSelection.addEventListener('click', () => {
                 state.selectedLordIds.clear();
                 renderLordList();
-                applyMapSelection();
-            });
-
-            ui.toggleRelevance.addEventListener('click', () => {
-                state.hideIrrelevantMunicipalities = !state.hideIrrelevantMunicipalities;
-                setRelevanceToggleLabel();
                 applyMapSelection();
             });
 
@@ -1013,7 +963,6 @@
 
             state.lords = buildLordData(lordsRows, holdingsRows);
             state.filteredLordIds = state.lords.map((lord) => lord.lordId);
-            setRelevanceToggleLabel();
             setStatus();
             renderLordList();
             applyMapSelection();
