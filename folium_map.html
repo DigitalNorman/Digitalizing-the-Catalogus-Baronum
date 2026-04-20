@@ -473,7 +473,7 @@
 
         function setStatus() {
             const total = selectedTotalKnights();
-            ui.status.textContent = `${state.selectedLordIds.size} selected, ${state.filteredLordIds.length} visible, total knights ${total}, total fiefs ${formatNumber(state.totalFiefsOwed)}.`;
+            ui.status.textContent = `${state.selectedLordIds.size} selected, ${state.filteredLordIds.length} visible, total knights ${total}, Knights owed from Fief ${formatNumber(state.totalFiefsOwed)}.`;
         }
 
         function renderLordList() {
@@ -491,7 +491,7 @@
             ui.list.innerHTML = visible.map((lord) => {
                 const checked = state.selectedLordIds.has(lord.lordId) ? 'checked' : '';
                 const holdingsPreview = lord.holdings.slice(0, 6)
-                    .map((holding) => `<li>${escapeHtml(holding.modernCommune)} (${escapeHtml(holding.province)})</li>`)
+                    .map((holding) => `<li>${escapeHtml(holding.modernCommune)} (${escapeHtml(holding.province)}) - ${escapeHtml(holding.numberFeudi)} fiefs</li>`)
                     .join('');
                 const extraCount = lord.holdings.length > 6
                     ? `<li>+ ${lord.holdings.length - 6} more holdings...</li>`
@@ -502,7 +502,7 @@
                         <label class="lord-main">
                             <input type="checkbox" data-role="lord-toggle" data-lord-id="${escapeHtml(lord.lordId)}" ${checked}>
                             <span>
-                                <span class="lord-title">ID ${escapeHtml(lord.lordId)} - ${escapeHtml(lord.fullName)}</span>
+                                <span class="lord-title">ID ${escapeHtml(lord.lordId)} - ${escapeHtml(lord.fullName)} (${escapeHtml(lord.feudiOwned)} fiefs)</span>
                                 <span class="lord-subtitle">${lord.holdings.length} holdings linked</span>
                             </span>
                         </label>
