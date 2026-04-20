@@ -442,6 +442,37 @@ input:focus, textarea:focus, select:focus {
     font-weight: bold;
 }
 
+.combined-row-details {
+    margin: 0;
+}
+
+.combined-row-details summary {
+    cursor: pointer;
+    color: #6b1a27;
+    font-weight: bold;
+}
+
+.combined-details-wrap {
+    margin-top: 0.45rem;
+}
+
+.combined-details-table {
+    margin: 0.35rem 0 0;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.combined-details-table th,
+.combined-details-table td {
+    font-size: 0.85rem;
+    padding: 0.45rem;
+}
+
+.combined-empty-details {
+    margin-top: 0.4rem;
+    color: #5a5a5a;
+    font-size: 0.9rem;
+}
+
 /* Map page */
 .map-panel {
     margin: 1rem 0 2rem;

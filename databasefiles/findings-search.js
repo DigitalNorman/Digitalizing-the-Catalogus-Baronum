@@ -37,19 +37,16 @@ const state = {
     sourceOriginalRows: []
 };
 
-const COMBINED_HEADERS = [
+const COMBINED_SORTABLE_HEADERS = [
     'Lord_ID',
     'Firstname',
     'Surname',
     'Total Knights',
     'Soldiers',
-    'Fiefs',
-    'Constable or Count',
-    'Contemporary City name',
-    'Modern City Name',
-    '# of Knights Owed',
-    'Province'
+    'Fiefs'
 ];
+
+const COMBINED_HEADERS = [...COMBINED_SORTABLE_HEADERS, 'Details'];
 
 function clean(value) {
     return String(value ?? '').replace(/\u00A0/g, ' ').trim();
@@ -212,58 +209,52 @@ function combinedRows(lords, holdings) {
         const lord = lordMap.get(lordId) || {};
         const relatedHoldings = (holdingsByLord.get(lordId) || []).slice();
 
-        if (!relatedHoldings.length) {
-            relatedHoldings.push({});
-        }
+        const firstName = clean(lord.Firstname) || 'NA';
+        const surname = clean(lord.Surname) || 'NA';
+        const milites = clean(lord.Milites) || 'NA';
+        const servientes = clean(lord.Servientes) || 'NA';
+        const feudiOwned = clean(lord.Feudi_Owned) || 'NA';
 
-        relatedHoldings.forEach((holding, index) => {
-            const firstRow = index === 0;
+        const detailRows = relatedHoldings.map((holding) => ({
+            constableOrCount: comestabuliaOrComitatus(holding),
+            contemporaryCity: clean(holding.Cont_Com_Name) || 'NA',
+            modernCity: clean(holding.Mod_Com_Name) || 'NA',
+            knightsOwed: clean(holding.Number_Feudi) || 'NA',
+            province: clean(holding.Modern_Province) || 'NA'
+        }));
 
-            const firstName = clean(lord.Firstname) || 'NA';
-            const surname = clean(lord.Surname) || 'NA';
-            const milites = clean(lord.Milites) || 'NA';
-            const servientes = clean(lord.Servientes) || 'NA';
-            const feudiOwned = clean(lord.Feudi_Owned) || 'NA';
-            const comestabuliaValue = comestabuliaOrComitatus(holding);
-            const cityValue = clean(holding.Mod_Com_Name) || 'NA';
-            const knightsOwedValue = clean(holding.Number_Feudi) || 'NA';
-            const contComName = clean(holding.Cont_Com_Name) || 'NA';
-            const province = clean(holding.Modern_Province) || 'NA';
+        const detailSearch = detailRows.flatMap((detail) => [
+            detail.constableOrCount,
+            detail.contemporaryCity,
+            detail.modernCity,
+            detail.knightsOwed,
+            detail.province
+        ]);
 
-            const rowValues = [
-                lordId,
-                firstName,
-                surname,
-                firstRow ? milites : '',
-                firstRow ? servientes : '',
-                firstRow ? feudiOwned : '',
-                comestabuliaValue,
-                contComName,
-                cityValue,
-                knightsOwedValue,
-                province
-            ];
+        const rowValues = [
+            lordId,
+            firstName,
+            surname,
+            milites,
+            servientes,
+            feudiOwned
+        ];
 
-            const searchValues = [
-                lordId,
-                firstName,
-                surname,
-                milites,
-                servientes,
-                feudiOwned,
-                comestabuliaValue,
-                contComName,
-                cityValue,
-                knightsOwedValue,
-                province
-            ];
+        const searchValues = [
+            lordId,
+            firstName,
+            surname,
+            milites,
+            servientes,
+            feudiOwned,
+            ...detailSearch
+        ];
 
-            rows.push({
-                values: rowValues,
-                sortValues: searchValues,
-                searchText: rowSearchText(searchValues),
-                isContinuation: !firstRow
-            });
+        rows.push({
+            values: rowValues,
+            sortValues: rowValues,
+            detailRows,
+            searchText: rowSearchText(searchValues)
         });
     });
 
@@ -338,8 +329,48 @@ function sortCombinedRowsInPlace() {
     });
 }
 
+function renderCombinedDetails(row) {
+    if (!row.detailRows || !row.detailRows.length) {
+        return '<details class="combined-row-details"><summary>Show details</summary><div class="combined-empty-details">No holding details available.</div></details>';
+    }
+
+    const detailRowsHtml = row.detailRows.map((detail) => `
+        <tr>
+            <td>${escapeHtml(detail.constableOrCount)}</td>
+            <td>${escapeHtml(detail.contemporaryCity)}</td>
+            <td>${escapeHtml(detail.modernCity)}</td>
+            <td>${escapeHtml(detail.knightsOwed)}</td>
+            <td>${escapeHtml(detail.province)}</td>
+        </tr>
+    `).join('');
+
+    return `
+        <details class="combined-row-details">
+            <summary>Show details (${row.detailRows.length})</summary>
+            <div class="combined-details-wrap">
+                <table class="combined-details-table">
+                    <thead>
+                        <tr>
+                            <th>Constable or Count</th>
+                            <th>Contemporary City name</th>
+                            <th>Modern City Name</th>
+                            <th># of Knights Owed</th>
+                            <th>Province</th>
+                        </tr>
+                    </thead>
+                    <tbody>${detailRowsHtml}</tbody>
+                </table>
+            </div>
+        </details>
+    `;
+}
+
 function renderCombinedTable() {
     ui.combinedHead.innerHTML = `<tr>${COMBINED_HEADERS.map((header, index) => {
+        if (index >= COMBINED_SORTABLE_HEADERS.length) {
+            return `<th>${escapeHtml(header)}</th>`;
+        }
+
         const isActive = state.combinedSort.columnIndex === index;
         const arrow = isActive
             ? (state.combinedSort.direction === 'asc' ? '[^]' : '[v]')
@@ -353,10 +384,8 @@ function renderCombinedTable() {
     }
 
     ui.combinedBody.innerHTML = state.combinedRows.map((row, index) => {
-        const className = row.isContinuation ? 'lord-continued' : '';
-        const classAttribute = className ? ` class="${className}"` : '';
         const cells = row.values.map((value) => `<td>${escapeHtml(value)}</td>`).join('');
-        return `<tr data-row="${index}"${classAttribute}>${cells}</tr>`;
+        return `<tr data-row="${index}">${cells}<td>${renderCombinedDetails(row)}</td></tr>`;
     }).join('');
 }
 
