@@ -281,7 +281,8 @@
             filteredLordIds: [],
             selectedLordIds: new Set(),
             query: '',
-            mapApi: null
+            mapApi: null,
+            totalFiefsOwed: 0
         };
 
         function clean(value) {
@@ -472,7 +473,7 @@
 
         function setStatus() {
             const total = selectedTotalKnights();
-            ui.status.textContent = `${state.selectedLordIds.size} selected, ${state.filteredLordIds.length} visible, total knights ${total}.`;
+            ui.status.textContent = `${state.selectedLordIds.size} selected, ${state.filteredLordIds.length} visible, total knights ${total}, total fiefs ${formatNumber(state.totalFiefsOwed)}.`;
         }
 
         function renderLordList() {
@@ -805,6 +806,11 @@
             if (selectionBounds.isValid()) {
                 mapApi.map.fitBounds(selectionBounds.pad(0.12));
             }
+
+            state.totalFiefsOwed = 0;
+            communeStats.forEach((stat) => {
+                state.totalFiefsOwed += stat.fiefKnightsOwed;
+            });
 
             setStatus();
         }
