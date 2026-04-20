@@ -249,7 +249,7 @@
         ></iframe>
     </section>
 
-    <p class="map-note">Communes remain unshaded by default. Once you select lords in the chart, communes shade by selected-lord count, and hover shows lord names with fiefs, knights, and soldiers totals.</p>
+    <p class="map-note">Communes remain unshaded by default. Once you select lords in the chart, communes shade by selected-lord count, and hover shows Lord IDs with commune-level knight and soldier metrics.</p>
 
     <footer class="site-footer">
         <p>
@@ -637,7 +637,8 @@
             return `
                 <div style="line-height:1.35;max-width:320px;">
                     <strong>Selected Lords:</strong> ${stat.lordIds.size}<br>
-                    <strong>Total Fiefs:</strong> ${formatNumber(stat.fiefs)}<br>
+                    <strong>Lords With Knights From Here:</strong> ${stat.lordsWithKnights.size}<br>
+                    <strong>Knights Owed From Fief:</strong> ${formatNumber(stat.fiefKnightsOwed)}<br>
                     <strong>Total Knights:</strong> ${formatNumber(stat.knights)}<br>
                     <strong>Total Soldiers:</strong> ${formatNumber(stat.soldiers)}<br>
                     <strong>Lord IDs:</strong> <span style="white-space:nowrap;">${idText || 'NA'}</span>
@@ -717,16 +718,17 @@
                 lordCommuneFeudi.forEach((feudiAtCommune, communeKey) => {
                     if (!communeStats.has(communeKey)) {
                         communeStats.set(communeKey, {
-                            fiefs: 0,
+                            fiefKnightsOwed: 0,
                             knights: 0,
                             soldiers: 0,
-                            lordIds: new Set()
+                            lordIds: new Set(),
+                            lordsWithKnights: new Set()
                         });
                     }
 
                     const stat = communeStats.get(communeKey);
                     stat.lordIds.add(lord.lordId);
-                    stat.fiefs += feudiAtCommune;
+                    stat.fiefKnightsOwed += feudiAtCommune;
 
                     const ratio = knownFeudiTotal > 0
                         ? ((feudiAtCommune > 0 ? feudiAtCommune : 0) / knownFeudiTotal)
@@ -734,6 +736,10 @@
 
                     stat.knights += lordKnights * ratio;
                     stat.soldiers += lordSoldiers * ratio;
+
+                    if ((lordKnights * ratio) > 0) {
+                        stat.lordsWithKnights.add(lord.lordId);
+                    }
                 });
             });
 
