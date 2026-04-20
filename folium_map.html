@@ -630,9 +630,9 @@
         }
 
         function communeTooltipHtml(communeName, stat) {
-            const lords = Array.from(stat.lordNames.values())
-                .sort((a, b) => a.localeCompare(b));
-            const names = lords.map((name) => escapeHtml(name)).join(', ');
+            const lordIds = Array.from(stat.lordIds.values())
+                .sort((a, b) => lordIdSortValue(a) - lordIdSortValue(b) || a.localeCompare(b));
+            const idText = lordIds.map((id) => escapeHtml(id)).join(', ');
 
             return `
                 <div style="line-height:1.35;max-width:280px;">
@@ -641,7 +641,7 @@
                     <strong>Total Fiefs:</strong> ${formatNumber(stat.fiefs)}<br>
                     <strong>Total Knights:</strong> ${formatNumber(stat.knights)}<br>
                     <strong>Total Soldiers:</strong> ${formatNumber(stat.soldiers)}<br>
-                    <strong>Lords:</strong> ${names || 'NA'}
+                    <strong>Lord IDs:</strong> ${idText || 'NA'}
                 </div>
             `;
         }
@@ -700,13 +700,13 @@
                             fiefs: 0,
                             knights: 0,
                             soldiers: 0,
-                            lordNames: new Set()
+                            lordIds: new Set()
                         });
                     }
 
                     const stat = communeStats.get(communeKey);
                     stat.count += 1;
-                    stat.lordNames.add(lord.fullName || `Lord ${lord.lordId}`);
+                    stat.lordIds.add(lord.lordId);
                     stat.fiefs += parseNumeric(lord.feudiOwned) || 0;
                     stat.knights += parseNumeric(lord.milites) || 0;
                     stat.soldiers += parseNumeric(lord.servientes) || 0;
@@ -751,7 +751,8 @@
                     layer.setStyle(activeStyle);
                     layer.bindTooltip(communeTooltipHtml(communeName, stat), {
                         sticky: true,
-                        direction: 'auto',
+                        direction: 'right',
+                        offset: [14, 0],
                         opacity: 0.97
                     });
                     layer.on('mouseover', () => {
