@@ -349,8 +349,8 @@ function renderCombinedTable() {
     ui.combinedHead.innerHTML = `<tr>${COMBINED_HEADERS.map((header, index) => {
         const isActive = state.combinedSort.columnIndex === index;
         const arrow = isActive
-            ? (state.combinedSort.direction === 'asc' ? '&#8593;' : '&#8595;')
-            : '&#8597;';
+            ? (state.combinedSort.direction === 'asc' ? '[^]' : '[v]')
+            : '[^v]';
         return `<th><button type="button" class="sortable-header-btn${isActive ? ' is-active' : ''}" data-sort-col="${index}"><span>${escapeHtml(header)}</span><span class="sort-arrow" aria-hidden="true">${arrow}</span></button></th>`;
     }).join('')}</tr>`;
 
