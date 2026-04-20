@@ -637,11 +637,8 @@
             return `
                 <div style="line-height:1.35;max-width:320px;">
                     <strong>Selected Lords:</strong> ${stat.lordIds.size}<br>
-                    <strong>Lords With Knights From Here:</strong> ${stat.lordsWithKnights.size}<br>
-                    <strong>Knights Owed From Fief:</strong> ${formatNumber(stat.fiefKnightsOwed)}<br>
-                    <strong>Total Knights:</strong> ${formatNumber(stat.knights)}<br>
-                    <strong>Total Soldiers:</strong> ${formatNumber(stat.soldiers)}<br>
-                    <strong>Lord IDs:</strong> <span style="white-space:nowrap;">${idText || 'NA'}</span>
+                    <strong>Lord IDs:</strong> <span style="white-space:nowrap;">${idText || 'NA'}</span><br>
+                    <strong>Knights Owed From Fief:</strong> ${formatNumber(stat.fiefKnightsOwed)}
                 </div>
             `;
         }
