@@ -7,22 +7,199 @@
     <link rel="stylesheet" href="medieval.css">
     <style>
         .folium-wrap {
+            position: relative;
             margin: 1rem 0 2rem;
         }
 
         #folium-iframe {
             width: 100%;
             height: 78vh;
-            min-height: 540px;
+            min-height: 560px;
             border: none;
             box-shadow: 0 0 10px rgba(212, 165, 116, 0.3);
             border-radius: 4px;
             background: #efe2c5;
         }
 
+        .lord-panel {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            bottom: 14px;
+            width: min(380px, calc(100% - 28px));
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid rgba(107, 26, 39, 0.35);
+            border-radius: 8px;
+            background: linear-gradient(180deg, rgba(249, 239, 221, 0.96), rgba(241, 228, 202, 0.96));
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+        }
+
+        .lord-panel-header {
+            padding: 0.85rem 0.95rem 0.7rem;
+            border-bottom: 1px solid rgba(107, 26, 39, 0.2);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lord-panel-header h2 {
+            margin: 0 0 0.45rem;
+            font-size: 1rem;
+            border: 0;
+            padding: 0;
+            letter-spacing: 0.04em;
+        }
+
+        .lord-panel-header p {
+            margin: 0;
+            font-size: 0.92rem;
+            line-height: 1.35;
+        }
+
+        .lord-search {
+            width: 100%;
+            margin-top: 0.65rem;
+            margin-bottom: 0;
+            padding: 0.55rem 0.7rem;
+            border: 1px solid rgba(107, 26, 39, 0.35);
+            border-radius: 4px;
+            background: #fff;
+            color: #4c3a2f;
+        }
+
+        .lord-panel-controls {
+            display: flex;
+            gap: 0.45rem;
+            margin-top: 0.55rem;
+        }
+
+        .lord-panel-controls button {
+            flex: 1;
+            padding: 0.45rem 0.35rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+        }
+
+        .lord-panel-status {
+            font-size: 0.86rem;
+            margin-top: 0.55rem;
+            color: #5a4737;
+        }
+
+        .lord-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.65rem;
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .lord-item {
+            border: 1px solid rgba(107, 26, 39, 0.2);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.55);
+            padding: 0.55rem 0.6rem;
+        }
+
+        .lord-main {
+            display: flex;
+            gap: 0.45rem;
+            align-items: flex-start;
+        }
+
+        .lord-main input {
+            margin-top: 0.2rem;
+            margin-bottom: 0;
+            transform: scale(1.05);
+        }
+
+        .lord-title {
+            display: block;
+            font-weight: bold;
+            font-size: 0.94rem;
+            line-height: 1.3;
+            color: #4b372a;
+        }
+
+        .lord-subtitle {
+            display: block;
+            font-size: 0.84rem;
+            margin-top: 0.08rem;
+            color: #6d5747;
+        }
+
+        .lord-item details {
+            margin-top: 0.4rem;
+            border-top: 1px dashed rgba(107, 26, 39, 0.25);
+            padding-top: 0.35rem;
+        }
+
+        .lord-item summary {
+            cursor: pointer;
+            font-size: 0.84rem;
+            color: #6b1a27;
+            font-weight: bold;
+            outline: none;
+            user-select: none;
+        }
+
+        .lord-meta {
+            margin-top: 0.32rem;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            color: #5a4737;
+        }
+
+        .lord-meta p {
+            margin: 0.18rem 0;
+            text-align: left;
+        }
+
+        .lord-meta ul {
+            margin: 0.3rem 0 0;
+            padding-left: 1rem;
+        }
+
+        .lord-meta li {
+            margin: 0.12rem 0;
+            font-size: 0.8rem;
+        }
+
+        .lord-empty {
+            padding: 0.8rem;
+            border: 1px dashed rgba(107, 26, 39, 0.35);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.55);
+            color: #5a4737;
+            font-size: 0.9rem;
+        }
+
+        .map-note {
+            margin-top: 0.5rem;
+            text-align: center;
+            font-size: 0.96rem;
+            color: #6b4f3e;
+        }
+
+        @media (max-width: 980px) {
+            .lord-panel {
+                position: static;
+                width: 100%;
+                margin-bottom: 0.8rem;
+                min-height: 360px;
+            }
+
+            #folium-iframe {
+                height: 65vh;
+                min-height: 460px;
+            }
+        }
+
         @media (max-width: 768px) {
             #folium-iframe {
-                height: 68vh;
+                height: 62vh;
                 min-height: 420px;
             }
         }
@@ -43,12 +220,26 @@
 
     <section class="intro-section">
         <p>
-            This page uses the same site style as the rest of the project, while the Folium map itself is isolated
-            in an embedded map document to preserve exact tile and geometry alignment.
+            Select one or more lords from the left panel. Their associated holdings are projected onto the map
+            as markers, with popups showing lord details and military obligations.
         </p>
     </section>
 
     <section class="folium-wrap">
+        <aside class="lord-panel" aria-label="Lords filter panel">
+            <div class="lord-panel-header">
+                <h2>Lord Selection Table</h2>
+                <p>Search by lord ID or name, then select multiple entries.</p>
+                <input id="lord-search" class="lord-search" type="search" placeholder="Search by ID, first name, or surname..." autocomplete="off">
+                <div class="lord-panel-controls">
+                    <button id="lords-select-visible" type="button">Select Visible</button>
+                    <button id="lords-clear-selection" type="button">Clear Selection</button>
+                </div>
+                <div id="lord-panel-status" class="lord-panel-status" aria-live="polite">Loading lord data...</div>
+            </div>
+            <div id="lord-list" class="lord-list"></div>
+        </aside>
+
         <iframe
             id="folium-iframe"
             src="folium_map_inner.html"
@@ -57,6 +248,8 @@
             referrerpolicy="no-referrer"
         ></iframe>
     </section>
+
+    <p class="map-note">Markers appear on the map for selected lords; click a marker to view total knights and holding details.</p>
 
     <footer class="site-footer">
         <p>
@@ -67,5 +260,502 @@
             Digital History Class Spring 2026
         </p>
     </footer>
+
+    <script>
+        const FILES = {
+            holdings: 'databasefiles/Final Baronum - Fief Holdings.csv',
+            lords: 'databasefiles/Final Baronum - Lords and Soldiers.csv'
+        };
+
+        const ui = {
+            search: document.getElementById('lord-search'),
+            list: document.getElementById('lord-list'),
+            status: document.getElementById('lord-panel-status'),
+            selectVisible: document.getElementById('lords-select-visible'),
+            clearSelection: document.getElementById('lords-clear-selection'),
+            iframe: document.getElementById('folium-iframe')
+        };
+
+        const state = {
+            lords: [],
+            filteredLordIds: [],
+            selectedLordIds: new Set(),
+            query: '',
+            mapApi: null
+        };
+
+        function clean(value) {
+            return String(value ?? '').replace(/\u00A0/g, ' ').trim();
+        }
+
+        function normalize(value) {
+            return clean(value)
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, ' ')
+                .toLowerCase();
+        }
+
+        function escapeHtml(value) {
+            return clean(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function parseNumeric(value) {
+            const parsed = Number.parseFloat(String(value).replace(',', '.'));
+            return Number.isFinite(parsed) ? parsed : null;
+        }
+
+        function parseCSV(csvText) {
+            const rows = [];
+            let row = [];
+            let cell = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < csvText.length; i += 1) {
+                const char = csvText[i];
+                const next = csvText[i + 1];
+
+                if (char === '"') {
+                    if (inQuotes && next === '"') {
+                        cell += '"';
+                        i += 1;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                    continue;
+                }
+
+                if (char === ',' && !inQuotes) {
+                    row.push(cell);
+                    cell = '';
+                    continue;
+                }
+
+                if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (char === '\r' && next === '\n') {
+                        continue;
+                    }
+                    if (cell.length || row.length) {
+                        row.push(cell);
+                        rows.push(row);
+                        row = [];
+                        cell = '';
+                    }
+                    continue;
+                }
+
+                cell += char;
+            }
+
+            if (cell.length || row.length) {
+                row.push(cell);
+                rows.push(row);
+            }
+
+            if (!rows.length) {
+                return [];
+            }
+
+            const headers = rows[0].map((header) => clean(header));
+            return rows.slice(1)
+                .filter((values) => values.some((value) => clean(value).length > 0))
+                .map((values) => {
+                    const record = {};
+                    headers.forEach((header, index) => {
+                        record[header] = clean(values[index]);
+                    });
+                    return record;
+                });
+        }
+
+        function lordIdSortValue(value) {
+            const parsed = Number.parseInt(clean(value), 10);
+            return Number.isFinite(parsed) ? parsed : Number.MAX_SAFE_INTEGER;
+        }
+
+        function buildLordData(lordsRows, holdingsRows) {
+            const byId = new Map();
+
+            lordsRows.forEach((row) => {
+                const id = clean(row.Lord_ID);
+                if (!id) {
+                    return;
+                }
+                if (!byId.has(id)) {
+                    const firstname = clean(row.Firstname) || 'NA';
+                    const surname = clean(row.Surname) || 'NA';
+                    byId.set(id, {
+                        lordId: id,
+                        firstname,
+                        surname,
+                        fullName: `${firstname} ${surname}`.trim(),
+                        milites: clean(row.Milites) || 'NA',
+                        servientes: clean(row.Servientes) || 'NA',
+                        feudiOwned: clean(row.Feudi_Owned) || 'NA',
+                        totalKnights: parseNumeric(row.Milites),
+                        holdings: []
+                    });
+                }
+            });
+
+            holdingsRows.forEach((row) => {
+                const id = clean(row.Lord_ID);
+                if (!id) {
+                    return;
+                }
+                if (!byId.has(id)) {
+                    byId.set(id, {
+                        lordId: id,
+                        firstname: 'NA',
+                        surname: 'NA',
+                        fullName: 'NA',
+                        milites: 'NA',
+                        servientes: 'NA',
+                        feudiOwned: 'NA',
+                        totalKnights: null,
+                        holdings: []
+                    });
+                }
+
+                const comestabulia = clean(row.Comestabulia);
+                const comitatus = clean(row.Comitatus);
+                const superior = comestabulia && normalize(comestabulia) !== 'na'
+                    ? comestabulia
+                    : (comitatus && normalize(comitatus) !== 'na' ? comitatus : 'NA');
+
+                byId.get(id).holdings.push({
+                    medievalCommune: clean(row.Cont_Com_Name) || 'NA',
+                    modernCommune: clean(row.Mod_Com_Name) || 'NA',
+                    province: clean(row.Modern_Province) || 'NA',
+                    numberFeudi: clean(row.Number_Feudi) || 'NA',
+                    superior
+                });
+            });
+
+            return Array.from(byId.values()).sort((a, b) => {
+                const diff = lordIdSortValue(a.lordId) - lordIdSortValue(b.lordId);
+                if (diff !== 0) {
+                    return diff;
+                }
+                return a.lordId.localeCompare(b.lordId);
+            });
+        }
+
+        function selectedTotalKnights() {
+            return state.lords
+                .filter((lord) => state.selectedLordIds.has(lord.lordId))
+                .reduce((sum, lord) => sum + (lord.totalKnights || 0), 0);
+        }
+
+        function filterLords() {
+            const query = normalize(state.query);
+            if (!query) {
+                state.filteredLordIds = state.lords.map((lord) => lord.lordId);
+                return;
+            }
+
+            state.filteredLordIds = state.lords
+                .filter((lord) => {
+                    const base = `${lord.lordId} ${lord.firstname} ${lord.surname} ${lord.fullName}`;
+                    const holdingsText = lord.holdings
+                        .map((holding) => `${holding.modernCommune} ${holding.province} ${holding.superior}`)
+                        .join(' ');
+                    return normalize(`${base} ${holdingsText}`).includes(query);
+                })
+                .map((lord) => lord.lordId);
+        }
+
+        function setStatus() {
+            const total = selectedTotalKnights();
+            ui.status.textContent = `${state.selectedLordIds.size} selected, ${state.filteredLordIds.length} visible, total knights ${total}.`;
+        }
+
+        function renderLordList() {
+            const lordsById = new Map(state.lords.map((lord) => [lord.lordId, lord]));
+            const visible = state.filteredLordIds
+                .map((id) => lordsById.get(id))
+                .filter(Boolean);
+
+            if (!visible.length) {
+                ui.list.innerHTML = '<div class="lord-empty">No lords match the current search.</div>';
+                setStatus();
+                return;
+            }
+
+            ui.list.innerHTML = visible.map((lord) => {
+                const checked = state.selectedLordIds.has(lord.lordId) ? 'checked' : '';
+                const holdingsPreview = lord.holdings.slice(0, 6)
+                    .map((holding) => `<li>${escapeHtml(holding.modernCommune)} (${escapeHtml(holding.province)})</li>`)
+                    .join('');
+                const extraCount = lord.holdings.length > 6
+                    ? `<li>+ ${lord.holdings.length - 6} more holdings...</li>`
+                    : '';
+
+                return `
+                    <div class="lord-item" data-lord-id="${escapeHtml(lord.lordId)}">
+                        <label class="lord-main">
+                            <input type="checkbox" data-role="lord-toggle" data-lord-id="${escapeHtml(lord.lordId)}" ${checked}>
+                            <span>
+                                <span class="lord-title">ID ${escapeHtml(lord.lordId)} - ${escapeHtml(lord.fullName)}</span>
+                                <span class="lord-subtitle">${lord.holdings.length} holdings linked</span>
+                            </span>
+                        </label>
+                        <details>
+                            <summary>Show Details</summary>
+                            <div class="lord-meta">
+                                <p><strong>Milites (Total Knights):</strong> ${escapeHtml(lord.milites)}</p>
+                                <p><strong>Servientes:</strong> ${escapeHtml(lord.servientes)}</p>
+                                <p><strong>Feudi Owned:</strong> ${escapeHtml(lord.feudiOwned)}</p>
+                                <p><strong>Sample Holdings:</strong></p>
+                                <ul>${holdingsPreview}${extraCount}</ul>
+                            </div>
+                        </details>
+                    </div>
+                `;
+            }).join('');
+
+            setStatus();
+        }
+
+        function getMapApi() {
+            if (state.mapApi) {
+                return state.mapApi;
+            }
+
+            const frameWindow = ui.iframe.contentWindow;
+            if (!frameWindow || !frameWindow.L) {
+                return null;
+            }
+
+            const L = frameWindow.L;
+            const values = Object.values(frameWindow);
+            const map = values.find((value) => value instanceof L.Map);
+            if (!map) {
+                return null;
+            }
+
+            let geoLayer = null;
+            map.eachLayer((layer) => {
+                if (!geoLayer && layer instanceof L.GeoJSON) {
+                    geoLayer = layer;
+                }
+            });
+            if (!geoLayer) {
+                geoLayer = values.find((value) => value instanceof L.GeoJSON) || null;
+            }
+            if (!geoLayer) {
+                return null;
+            }
+
+            const municipalityCenters = new Map();
+            const provinceBuckets = new Map();
+
+            geoLayer.eachLayer((layer) => {
+                if (!layer.feature || !layer.feature.properties || !layer.getBounds) {
+                    return;
+                }
+
+                const props = layer.feature.properties;
+                const center = layer.getBounds().getCenter();
+                const municipality = normalize(props.name);
+                const province = normalize(props.prov_name);
+
+                if (municipality && !municipalityCenters.has(municipality)) {
+                    municipalityCenters.set(municipality, center);
+                }
+
+                if (province) {
+                    if (!provinceBuckets.has(province)) {
+                        provinceBuckets.set(province, { lat: 0, lng: 0, count: 0 });
+                    }
+                    const bucket = provinceBuckets.get(province);
+                    bucket.lat += center.lat;
+                    bucket.lng += center.lng;
+                    bucket.count += 1;
+                }
+            });
+
+            const provinceCenters = new Map();
+            provinceBuckets.forEach((bucket, province) => {
+                if (bucket.count > 0) {
+                    provinceCenters.set(province, L.latLng(bucket.lat / bucket.count, bucket.lng / bucket.count));
+                }
+            });
+
+            const overlayLayer = L.layerGroup().addTo(map);
+
+            state.mapApi = {
+                L,
+                map,
+                overlayLayer,
+                municipalityCenters,
+                provinceCenters
+            };
+
+            return state.mapApi;
+        }
+
+        function resolveHoldingCenter(mapApi, holding) {
+            const communeCandidates = [
+                normalize(holding.modernCommune.replace(/\([^)]*\)/g, '')),
+                normalize(holding.medievalCommune)
+            ].filter(Boolean);
+
+            for (const candidate of communeCandidates) {
+                const match = mapApi.municipalityCenters.get(candidate);
+                if (match) {
+                    return match;
+                }
+            }
+
+            const provinceKey = normalize(holding.province);
+            if (provinceKey && mapApi.provinceCenters.has(provinceKey)) {
+                return mapApi.provinceCenters.get(provinceKey);
+            }
+
+            return null;
+        }
+
+        function applyMapSelection() {
+            const mapApi = getMapApi();
+            if (!mapApi) {
+                return;
+            }
+
+            mapApi.overlayLayer.clearLayers();
+
+            const selectedLords = state.lords.filter((lord) => state.selectedLordIds.has(lord.lordId));
+            const markerBounds = [];
+
+            selectedLords.forEach((lord) => {
+                lord.holdings.forEach((holding) => {
+                    const center = resolveHoldingCenter(mapApi, holding);
+                    if (!center) {
+                        return;
+                    }
+
+                    const marker = mapApi.L.circleMarker(center, {
+                        radius: 6,
+                        color: '#6b1a27',
+                        weight: 1.1,
+                        fillColor: '#d8b07a',
+                        fillOpacity: 0.88
+                    });
+
+                    marker.bindPopup(
+                        `<strong>Lord ID:</strong> ${escapeHtml(lord.lordId)}<br>` +
+                        `<strong>Name:</strong> ${escapeHtml(lord.fullName)}<br>` +
+                        `<strong>Total Knights (Milites):</strong> ${escapeHtml(lord.milites)}<br>` +
+                        `<strong>Servientes:</strong> ${escapeHtml(lord.servientes)}<br>` +
+                        `<strong>Feudi Owned:</strong> ${escapeHtml(lord.feudiOwned)}<br>` +
+                        `<strong>Commune:</strong> ${escapeHtml(holding.modernCommune)}<br>` +
+                        `<strong>Province:</strong> ${escapeHtml(holding.province)}<br>` +
+                        `<strong>Superior:</strong> ${escapeHtml(holding.superior)}`
+                    );
+
+                    marker.addTo(mapApi.overlayLayer);
+                    markerBounds.push(center);
+                });
+            });
+
+            if (markerBounds.length) {
+                const bounds = mapApi.L.latLngBounds(markerBounds);
+                mapApi.map.fitBounds(bounds.pad(0.2));
+            }
+
+            setStatus();
+        }
+
+        function bindUI() {
+            ui.search.addEventListener('input', () => {
+                state.query = ui.search.value;
+                filterLords();
+                renderLordList();
+            });
+
+            ui.selectVisible.addEventListener('click', () => {
+                state.filteredLordIds.forEach((lordId) => state.selectedLordIds.add(lordId));
+                renderLordList();
+                applyMapSelection();
+            });
+
+            ui.clearSelection.addEventListener('click', () => {
+                state.selectedLordIds.clear();
+                renderLordList();
+                applyMapSelection();
+            });
+
+            ui.list.addEventListener('change', (event) => {
+                const target = event.target;
+                if (!(target instanceof HTMLInputElement)) {
+                    return;
+                }
+                if (target.dataset.role !== 'lord-toggle') {
+                    return;
+                }
+
+                const lordId = target.dataset.lordId;
+                if (!lordId) {
+                    return;
+                }
+
+                if (target.checked) {
+                    state.selectedLordIds.add(lordId);
+                } else {
+                    state.selectedLordIds.delete(lordId);
+                }
+
+                renderLordList();
+                applyMapSelection();
+            });
+
+            ui.iframe.addEventListener('load', () => {
+                applyMapSelection();
+            });
+        }
+
+        async function loadData() {
+            const cacheBuster = `?t=${Date.now()}`;
+            const [lordsResponse, holdingsResponse] = await Promise.all([
+                fetch(encodeURI(FILES.lords) + cacheBuster),
+                fetch(encodeURI(FILES.holdings) + cacheBuster)
+            ]);
+
+            if (!lordsResponse.ok || !holdingsResponse.ok) {
+                throw new Error('Could not load one or more source CSV files.');
+            }
+
+            const [lordsCsv, holdingsCsv] = await Promise.all([
+                lordsResponse.text(),
+                holdingsResponse.text()
+            ]);
+
+            const lordsRows = parseCSV(lordsCsv);
+            const holdingsRows = parseCSV(holdingsCsv);
+
+            state.lords = buildLordData(lordsRows, holdingsRows);
+            state.filteredLordIds = state.lords.map((lord) => lord.lordId);
+            setStatus();
+            renderLordList();
+            applyMapSelection();
+        }
+
+        async function init() {
+            bindUI();
+            try {
+                await loadData();
+            } catch (error) {
+                ui.list.innerHTML = `<div class="lord-empty">${escapeHtml(error.message || 'Failed to load data.')}</div>`;
+                ui.status.textContent = 'Unable to load lord data.';
+            }
+        }
+
+        init();
+    </script>
 </body>
 </html>
