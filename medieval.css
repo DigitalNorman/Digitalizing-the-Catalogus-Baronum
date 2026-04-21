@@ -342,6 +342,35 @@ input:focus, textarea:focus, select:focus {
     color: #5a5a5a;
 }
 
+.findings-hero {
+    margin: 0 0 1.4rem;
+}
+
+.findings-hero-title {
+    margin: 0 0 0.9rem;
+    border: 0;
+    padding: 0;
+    text-align: center;
+    font-size: clamp(2.1rem, 4vw, 3.2rem);
+    line-height: 1.08;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6b1a27;
+    text-shadow: 0 2px 0 rgba(255, 255, 255, 0.5), 0 5px 14px rgba(0, 0, 0, 0.25);
+}
+
+.findings-hero-image {
+    width: 100%;
+    min-height: clamp(360px, 62vh, 760px);
+    object-fit: contain;
+    object-position: top center;
+    border: 3px double #d4a574;
+    border-radius: 6px;
+    background: rgba(244, 228, 193, 0.65);
+    box-shadow: 0 0 10px rgba(212, 165, 116, 0.3);
+    text-align: center;
+}
+
 /* Findings database */
 .findings-db {
     display: grid;
