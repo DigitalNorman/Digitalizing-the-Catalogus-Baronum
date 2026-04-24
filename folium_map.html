@@ -77,12 +77,13 @@
 
         .lord-panel-controls {
             display: flex;
+            flex-wrap: wrap;
             gap: 0.45rem;
             margin-top: 0.55rem;
         }
 
         .lord-panel-controls button {
-            flex: 1;
+            flex: 1 1 30%;
             padding: 0.45rem 0.35rem;
             font-size: 0.72rem;
             letter-spacing: 0.06em;
@@ -281,6 +282,7 @@
                 <div class="lord-panel-controls">
                     <button id="lords-select-visible" type="button">Select Visible</button>
                     <button id="lords-clear-selection" type="button">Clear Selection</button>
+                    <button id="lords-toggle-unassociated" type="button">Hide Unassociated Outlines: OFF</button>
                 </div>
                 <button id="lord-panel-toggle" class="lord-panel-toggle" type="button" aria-expanded="true" aria-label="Minimize table" title="Minimize table">X</button>
                 <div id="lord-panel-status" class="lord-panel-status" aria-live="polite">Loading lord data...</div>
@@ -324,6 +326,7 @@
             status: document.getElementById('lord-panel-status'),
             selectVisible: document.getElementById('lords-select-visible'),
             clearSelection: document.getElementById('lords-clear-selection'),
+            toggleUnassociated: document.getElementById('lords-toggle-unassociated'),
             panelToggle: document.getElementById('lord-panel-toggle'),
             panelRestore: document.getElementById('lord-panel-restore'),
             iframe: document.getElementById('folium-iframe')
@@ -336,8 +339,15 @@
             query: '',
             mapApi: null,
             totalFiefsOwed: 0,
-            isPanelCollapsed: false
+            isPanelCollapsed: false,
+            hideUnassociatedOutlines: false
         };
+
+        function setOutlineToggleLabel() {
+            ui.toggleUnassociated.textContent = state.hideUnassociatedOutlines
+                ? 'Hide Unassociated Outlines: ON'
+                : 'Hide Unassociated Outlines: OFF';
+        }
 
         function setPanelCollapsed(collapsed) {
             state.isPanelCollapsed = Boolean(collapsed);
@@ -723,11 +733,38 @@
             };
         }
 
+        function hiddenPolygonStyle() {
+            return {
+                color: '#000000',
+                weight: 0,
+                opacity: 0,
+                fillColor: '#efe2c5',
+                fillOpacity: 0
+            };
+        }
+
+        function associatedCommuneKeys(mapApi) {
+            const keys = new Set();
+
+            state.lords.forEach((lord) => {
+                lord.holdings.forEach((holding) => {
+                    const communeKey = resolveHoldingCommuneKey(mapApi, holding);
+                    if (communeKey) {
+                        keys.add(communeKey);
+                    }
+                });
+            });
+
+            return keys;
+        }
+
         function applyMapSelection() {
             const mapApi = getMapApi();
             if (!mapApi) {
                 return;
             }
+
+            const associatedKeys = associatedCommuneKeys(mapApi);
 
             const selectedLords = state.lords.filter((lord) => state.selectedLordIds.has(lord.lordId));
 
@@ -743,6 +780,12 @@
                     }
                     if (layer.unbindTooltip) {
                         layer.unbindTooltip();
+                    }
+
+                    const communeKey = normalize(layer.feature?.properties?.name || '');
+                    if (state.hideUnassociatedOutlines && !associatedKeys.has(communeKey)) {
+                        layer.setStyle(hiddenPolygonStyle());
+                        return;
                     }
 
                     layer.setStyle(defaultPolygonStyle());
@@ -870,6 +913,10 @@
                         selectionBounds.extend(layer.getBounds());
                     }
                 } else {
+                    if (state.hideUnassociatedOutlines && !associatedKeys.has(communeKey)) {
+                        layer.setStyle(hiddenPolygonStyle());
+                        return;
+                    }
                     layer.setStyle(defaultPolygonStyle());
                 }
             });
@@ -910,6 +957,12 @@
             ui.clearSelection.addEventListener('click', () => {
                 state.selectedLordIds.clear();
                 renderLordList();
+                applyMapSelection();
+            });
+
+            ui.toggleUnassociated.addEventListener('click', () => {
+                state.hideUnassociatedOutlines = !state.hideUnassociatedOutlines;
+                setOutlineToggleLabel();
                 applyMapSelection();
             });
 
@@ -963,6 +1016,7 @@
 
             state.lords = buildLordData(lordsRows, holdingsRows);
             state.filteredLordIds = state.lords.map((lord) => lord.lordId);
+            setOutlineToggleLabel();
             setStatus();
             renderLordList();
             applyMapSelection();
