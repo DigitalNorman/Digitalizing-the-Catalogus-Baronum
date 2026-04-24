@@ -259,6 +259,14 @@
             color: #6b4f3e;
         }
 
+        .legend-gradient {
+            width: 100%;
+            height: 0.95rem;
+            border: 1px solid rgba(75, 55, 42, 0.35);
+            border-radius: 2px;
+            background: linear-gradient(90deg, #efe2c5 0%, #d9a084 35%, #a13945 68%, #5a0f1d 100%);
+        }
+
         .panel-restore {
             position: absolute;
             top: 72px;
@@ -762,44 +770,16 @@
                 return;
             }
 
-            if (!hasSelection || !Number.isFinite(maxFiefOwed) || maxFiefOwed <= 0) {
-                ui.legend.innerHTML = `
-                    <h3>Map Legend</h3>
-                    <p class="legend-subtitle">Fill color shows the amount of knights owed from fiefs for the selected lord(s).</p>
-                    <div class="legend-scale">
-                        <div class="legend-row">
-                            <span class="legend-swatch" style="background:#efe2c5;"></span>
-                            <span>Select one or more lords to color the map.</span>
-                        </div>
-                    </div>
-                    <p class="legend-note">Darker shades mean higher fief obligations in that commune.</p>
-                `;
-                return;
-            }
-
-            const scalePoints = [0.2, 0.4, 0.6, 0.8, 1];
-            const rowsHtml = scalePoints.map((point) => {
-                const value = maxFiefOwed * point;
-                const percent = Math.round(point * 100);
-                return `
-                    <div class="legend-row">
-                        <span class="legend-swatch" style="background:${choroplethColor(value, maxFiefOwed)};"></span>
-                        <span>${percent}% of the current maximum commune total</span>
-                    </div>
-                `;
-            }).join('');
-
             ui.legend.innerHTML = `
                 <h3>Map Legend</h3>
-                <p class="legend-subtitle">Fill color shows the amount of knights owed from fiefs for the selected lord(s).</p>
+                <p class="legend-subtitle">Color shows how many knights are owed from fiefs in each commune.</p>
                 <div class="legend-scale">
                     <div class="legend-row">
-                        <span class="legend-swatch" style="background:#efe2c5;"></span>
-                        <span>No fief knights owed</span>
+                        <span class="legend-gradient"></span>
+                        <span>Least owed to most owed</span>
                     </div>
-                    ${rowsHtml}
                 </div>
-                <p class="legend-note">Darker shades mean higher fief obligations in that commune.</p>
+                <p class="legend-note">${hasSelection && Number.isFinite(maxFiefOwed) && maxFiefOwed > 0 ? 'Darker red means more is owed.' : 'Select one or more lords to activate shading.'}</p>
             `;
         }
 
