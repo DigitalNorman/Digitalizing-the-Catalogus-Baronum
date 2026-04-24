@@ -206,6 +206,59 @@
             color: #6b4f3e;
         }
 
+        .map-legend {
+            position: absolute;
+            right: 14px;
+            bottom: 18px;
+            z-index: 520;
+            width: min(280px, calc(100% - 28px));
+            padding: 0.8rem 0.9rem;
+            border: 2px solid rgba(107, 26, 39, 0.3);
+            border-radius: 8px;
+            background: linear-gradient(180deg, rgba(249, 239, 221, 0.97), rgba(241, 228, 202, 0.97));
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+            color: #4b372a;
+            font-size: 0.82rem;
+            line-height: 1.35;
+            pointer-events: none;
+        }
+
+        .map-legend h3 {
+            margin: 0 0 0.45rem;
+            font-size: 0.86rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .legend-subtitle {
+            margin: 0 0 0.55rem;
+        }
+
+        .legend-scale {
+            display: grid;
+            gap: 0.35rem;
+        }
+
+        .legend-row {
+            display: grid;
+            grid-template-columns: 1.2rem 1fr;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .legend-swatch {
+            width: 1.2rem;
+            height: 0.95rem;
+            border: 1px solid rgba(75, 55, 42, 0.35);
+            border-radius: 2px;
+        }
+
+        .legend-note {
+            margin: 0.55rem 0 0;
+            font-size: 0.79rem;
+            color: #6b4f3e;
+        }
+
         .panel-restore {
             position: absolute;
             top: 72px;
@@ -298,9 +351,11 @@
             loading="eager"
             referrerpolicy="no-referrer"
         ></iframe>
+
+        <div id="map-legend" class="map-legend" aria-live="polite"></div>
     </section>
 
-    <p class="map-note">Communes remain unshaded by default. Once you select lords in the chart, communes shade by selected-lord count, and hover shows Lord IDs with commune-level knight and soldier metrics.</p>
+    <p class="map-note">Communes remain unshaded by default. Once you select lords in the chart, communes shade by the amount of knights owed from fiefs linked to the selected lord(s), and hover shows Lord IDs with commune-level knight and soldier metrics.</p>
 
     <footer class="site-footer">
         <p>
@@ -328,7 +383,8 @@
             toggleUnassociated: document.getElementById('lords-toggle-unassociated'),
             panelToggle: document.getElementById('lord-panel-toggle'),
             panelRestore: document.getElementById('lord-panel-restore'),
-            iframe: document.getElementById('folium-iframe')
+            iframe: document.getElementById('folium-iframe'),
+            legend: document.getElementById('map-legend')
         };
 
         const state = {
@@ -701,6 +757,52 @@
             return '#d9a084';
         }
 
+        function renderLegend(maxFiefOwed, hasSelection) {
+            if (!ui.legend) {
+                return;
+            }
+
+            if (!hasSelection || !Number.isFinite(maxFiefOwed) || maxFiefOwed <= 0) {
+                ui.legend.innerHTML = `
+                    <h3>Map Legend</h3>
+                    <p class="legend-subtitle">Fill color shows the amount of knights owed from fiefs for the selected lord(s).</p>
+                    <div class="legend-scale">
+                        <div class="legend-row">
+                            <span class="legend-swatch" style="background:#efe2c5;"></span>
+                            <span>Select one or more lords to color the map.</span>
+                        </div>
+                    </div>
+                    <p class="legend-note">Darker shades mean higher fief obligations in that commune.</p>
+                `;
+                return;
+            }
+
+            const scalePoints = [0.2, 0.4, 0.6, 0.8, 1];
+            const rowsHtml = scalePoints.map((point) => {
+                const value = maxFiefOwed * point;
+                const percent = Math.round(point * 100);
+                return `
+                    <div class="legend-row">
+                        <span class="legend-swatch" style="background:${choroplethColor(value, maxFiefOwed)};"></span>
+                        <span>${percent}% of the current maximum commune total</span>
+                    </div>
+                `;
+            }).join('');
+
+            ui.legend.innerHTML = `
+                <h3>Map Legend</h3>
+                <p class="legend-subtitle">Fill color shows the amount of knights owed from fiefs for the selected lord(s).</p>
+                <div class="legend-scale">
+                    <div class="legend-row">
+                        <span class="legend-swatch" style="background:#efe2c5;"></span>
+                        <span>No fief knights owed</span>
+                    </div>
+                    ${rowsHtml}
+                </div>
+                <p class="legend-note">Darker shades mean higher fief obligations in that commune.</p>
+            `;
+        }
+
         function formatNumber(value) {
             if (!Number.isFinite(value)) {
                 return '0';
@@ -790,6 +892,7 @@
 
                     layer.setStyle(defaultPolygonStyle());
                 });
+                renderLegend(0, false);
                 setStatus();
                 return;
             }
@@ -855,10 +958,10 @@
                 });
             });
 
-            let maxCount = 0;
+            let maxFiefOwed = 0;
             communeStats.forEach((stat) => {
-                if (stat.lordIds.size > maxCount) {
-                    maxCount = stat.lordIds.size;
+                if (stat.fiefKnightsOwed > maxFiefOwed) {
+                    maxFiefOwed = stat.fiefKnightsOwed;
                 }
             });
 
@@ -882,11 +985,12 @@
                 }
 
                 if (stat && stat.lordIds.size > 0) {
+                    const fillValue = stat.fiefKnightsOwed;
                     const activeStyle = {
                         color: '#3d0a15',
                         weight: 1.2,
                         opacity: 1,
-                        fillColor: choroplethColor(stat.lordIds.size, maxCount),
+                        fillColor: choroplethColor(fillValue, maxFiefOwed),
                         fillOpacity: 0.8
                     };
 
@@ -931,6 +1035,7 @@
                 state.totalFiefsOwed += stat.fiefKnightsOwed;
             });
 
+            renderLegend(maxFiefOwed, selectedLords.length > 0);
             setStatus();
         }
 
@@ -1018,6 +1123,7 @@
             state.lords = buildLordData(lordsRows, holdingsRows);
             state.filteredLordIds = state.lords.map((lord) => lord.lordId);
             setOutlineToggleLabel();
+            renderLegend(0, false);
             setStatus();
             renderLordList();
             applyMapSelection();
