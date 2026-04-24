@@ -45,7 +45,7 @@ Quick dependency checks:
 - `findings.html` - The database page that loads the CSV data and displays the searchable combined table.
 - `folium_map.html` - The interactive Folium map page with the lord selection panel and commune highlighting logic.
 - `folium_map_inner.html` - The generated standalone Folium map rendered inside an iframe on the map page.
-- `generate_folium_inner.py` - Python script that regenerates `folium_map_inner.html` from the municipalities GeoJSON.
+- `generate_folium_inner.py` - Python script that regenerates `folium_map_inner.html` from the municipal boundary GeoJSON.
 - `generate_folium_map.py` - Legacy generator that writes to `folium_map.html`.
 - `planning.html` - The planning page with the design notes and planning images.
 - `sustainability.html` - The sustainability page with citations and ways to maintain and operate the website.
@@ -54,8 +54,8 @@ Quick dependency checks:
 - `databasefiles/Final Baronum - Lords and Soldiers.csv` - Source data for lord names and military values.
 - `databasefiles/Final Baronum - Fief Holdings.csv` - Source data for holdings, city names, and province details.
 - `databasefiles/Final Baronum - Original Text.csv` - Source data for the original Latin text.
-- `databasefiles/Italy_comunes.csv` - Supporting geographic data file (Not yet in use).
-- `databasefiles/limits_IT_municipalities.geojson` - Supporting geographic boundary file (not yet in use).
+- `databasefiles/Italy_comunes.csv` - Legacy supporting geographic data file that is not used by the current Folium map workflow.
+- `databasefiles/limits_IT_municipalities.geojson` - Municipal boundary GeoJSON used to build the Folium map.
 - `images/` - Planning page image assets.
 
 ## Data Sources
@@ -70,6 +70,15 @@ The website uses the following data sources:
 These CSV files provide the data that powers the findings database.
 
 The GeoJSON file provides the municipal boundaries used by the Folium map.
+
+## Map Data Sources
+
+The Folium map uses:
+
+- `databasefiles/limits_IT_municipalities.geojson` for municipal boundaries.
+- `databasefiles/Final Baronum - Lords and Soldiers.csv` and `databasefiles/Final Baronum - Fief Holdings.csv` for the lord-selection data shown in the custom map panel.
+
+The file `databasefiles/Italy_comunes.csv` is currently not part of the map-generation workflow.
 
 ## Viewing the Site Locally
 
