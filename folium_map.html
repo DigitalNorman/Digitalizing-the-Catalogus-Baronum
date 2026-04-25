@@ -619,7 +619,7 @@
 
         function setStatus() {
             const total = selectedTotalKnights();
-            ui.status.textContent = `${state.selectedLordIds.size} selected, ${state.filteredLordIds.length} Results, total knights ${total}, # Knights owed from Fief(s) ${formatNumber(state.totalFiefsOwed)}.`;
+            ui.status.textContent = `${state.selectedLordIds.size} selected, ${state.filteredLordIds.length} Results, total knights ${Math.round(total)}, # Knights owed from Fief(s) ${formatNumber(state.totalFiefsOwed)}.`;
         }
 
         function renderLordList() {
