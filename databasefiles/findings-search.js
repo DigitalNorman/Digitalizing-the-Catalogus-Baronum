@@ -506,21 +506,21 @@ async function loadAndBuildTables() {
         renderTable(
             ui.lordsHead,
             ui.lordsBody,
-            ['Book_ID', 'Lord ID', 'Firstname', 'Surname', 'Total Knights', 'Soldeirs', 'Fief(s)', 'Notes'],
+            ['Book ID', 'Lord ID', 'Firstname', 'Surname', 'Total Knights', 'Soldeirs', 'Fief(s)', 'Notes'],
             state.sourceLordsRows
         );
 
         renderTable(
             ui.holdingsHead,
             ui.holdingsBody,
-            ['Book_ID', 'Lord ID', 'Contemporary Commune Name', 'Modern Commune Name', 'Modern_Province', '# of knights owed', 'Count', 'Constable', 'Notes'],
+            ['Book ID', 'Lord ID', 'Contemporary Commune Name', 'Modern Commune Name', 'Modern Province', '# of knights owed', 'Count', 'Constable', 'Notes'],
             state.sourceHoldingsRows
         );
 
         renderTable(
             ui.originalHead,
             ui.originalBody,
-            ['Book_ID', 'Original Text'],
+            ['Book ID', 'Original Text'],
             state.sourceOriginalRows
         );
 
