@@ -619,7 +619,7 @@
 
         function setStatus() {
             const total = selectedTotalKnights();
-            ui.status.textContent = `${state.selectedLordIds.size} Selected, ${state.filteredLordIds.length} Results, total knights ${Math.round(total)}, Knights owed from Fief(s) ${formatNumber(state.totalFiefsOwed)}.`;
+            ui.status.textContent = `${state.selectedLordIds.size} Selected, ${state.filteredLordIds.length} Results, Total Knights ${Math.round(total)}, Knights owed from Fief(s) ${formatNumber(state.totalFiefsOwed)}.`;
         }
 
         function renderLordList() {
@@ -648,8 +648,8 @@
                         <label class="lord-main">
                             <input type="checkbox" data-role="lord-toggle" data-lord-id="${escapeHtml(lord.lordId)}" ${checked}>
                             <span>
-                                <span class="lord-title">ID ${escapeHtml(lord.lordId)} - ${escapeHtml(lord.fullName)} (${escapeHtml(lord.feudiOwned)} fiefs)</span>
-                                <span class="lord-subtitle">${lord.holdings.length} holdings linked</span>
+                                <span class="lord-title">ID ${escapeHtml(lord.lordId)} - ${escapeHtml(lord.fullName)} (${escapeHtml(lord.feudiOwned)} Fiefs)</span>
+                                <span class="lord-subtitle">${lord.holdings.length} Holdings Linked</span>
                             </span>
                         </label>
                         <details>
