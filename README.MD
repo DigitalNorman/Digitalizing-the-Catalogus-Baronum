@@ -78,6 +78,16 @@ The Folium map uses:
 
 The file `databasefiles/Italy_comunes.csv` is currently not part of the map-generation workflow.
 
+## Leaflet
+
+The interactive map is built on Leaflet through Folium.
+
+- `folium_map_inner.html` includes the Leaflet JavaScript and CSS assets that power the rendered map.
+- `folium_map.html` wraps that generated map in the site layout and adds the custom selection panel.
+- `medieval.css` contains Leaflet-specific styling for the map container and tiles.
+
+You do not need to install Leaflet separately for normal use of the site. Regenerating the map only requires Python and the `folium` package.
+
 ## Viewing the Site Locally
 
 1. Download or clone the repository.

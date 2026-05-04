@@ -40,7 +40,7 @@ const COMBINED_SORTABLE_HEADERS = [
     'Firstname',
     'Surname',
     'Total Knights',
-    'Soldeirs',
+    'Soldiers',
     'Fief(s)'
 ];
 
